@@ -1,0 +1,14 @@
+# Tests use a throwaway in-memory database instead of the real db/trips file.
+spring:
+  datasource:
+    url: jdbc:h2:mem:test
+  jpa:
+    hibernate:
+      # Create the tables from the entity classes, drop them afterwards.
+      ddl-auto: create-drop
+    show-sql: false
+    # Run data.sql after Hibernate has created the tables.
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always

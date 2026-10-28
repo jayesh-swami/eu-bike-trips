@@ -1,0 +1,8 @@
+# H2 database built by ./gradlew flywayMigrate (~300 MB)
+db/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Raw/cleaned datasets (~228 MB), kept local only
+data_findings/data/

@@ -1,0 +1,107 @@
+# The GraphQL schema: every type, field and argument the API offers.
+# Spring for GraphQL loads all *.graphqls files under resources/graphql/.
+# Text in "quotes" or """triple quotes""" is a description and shows up in GraphiQL's docs panel.
+# `!` means non-null. `[Trip!]!` is a non-null list of non-null trips.
+
+"Entry points: each field here is a query a client can run."
+type Query {
+  "The newest trips."
+  allTrips(limit: Int = 100): [Trip!]!
+
+  "Trips matching every filter field that is set, newest first."
+  tripsByFilter(filter: TripFilter!, limit: Int = 500): [Trip!]!
+
+  "All bike-sharing cities, sorted by name."
+  cities: [City!]!
+
+  "Stations in one city, sorted by name."
+  stations(cityId: Int!): [Station!]!
+
+  "The most recent status snapshots of one station, newest first."
+  stationStatus(stationId: ID!, limit: Int = 50): [StationStatus!]!
+}
+
+"""
+An input type groups arguments together. Every field is optional:
+leave it out to skip that condition.
+"""
+input TripFilter {
+  cityId: Int
+  "Trips that start OR end at this station."
+  stationId: ID
+  "Inclusive, ISO date such as 2023-01-31 (UTC)."
+  fromDate: String
+  "Inclusive, ISO date such as 2023-01-31 (UTC)."
+  toDate: String
+  "Meters."
+  minDistance: Float
+  "Meters."
+  maxDistance: Float
+}
+
+"One rental: where and when a bike was taken and returned."
+type Trip {
+  id: ID!
+  bikeId: Int!
+  cityId: Int!
+  "Rental start as an ISO-8601 UTC timestamp, e.g. 2023-01-31T08:15:00Z."
+  timeStart: String!
+  latStart: Float!
+  lonStart: Float!
+  latEnd: Float!
+  lonEnd: Float!
+  "Null for free-floating rentals."
+  stationIdStart: ID
+  "Null for free-floating rentals."
+  stationIdEnd: ID
+  "Battery % at the start; e-bikes only."
+  batteryStart: Float
+  "Battery % at the end; e-bikes only."
+  batteryEnd: Float
+  "Seconds."
+  duration: Int!
+  "Meters, straight line between start and end."
+  distance: Float!
+  "The city this trip belongs to. A nested object, resolved by TripController.city()."
+  city: City!
+}
+
+"A bike-sharing scheme (usually one city)."
+type City {
+  id: Int!
+  name: String!
+  "ISO-3166 alpha-2 code, e.g. DE."
+  country: String!
+  "Approximate city center."
+  lat: Float!
+  lon: Float!
+  "IANA time zone, e.g. Europe/Berlin."
+  timezone: String!
+}
+
+"A docking station where bikes can be rented and returned."
+type Station {
+  id: ID!
+  name: String!
+  cityId: Int!
+  "Number of regular docks."
+  bikeRacks: Int
+  "Number of charging docks."
+  specialRacks: Int
+  lat: Float!
+  lon: Float!
+}
+
+"A snapshot of a station's bikes and free racks at one moment."
+type StationStatus {
+  "ISO-8601 UTC timestamp."
+  time: String!
+  "Total bikes docked."
+  bikes: Int!
+  "Bikes ready to rent."
+  bikesAvailableToRent: Int!
+  "Empty regular docks."
+  freeRacks: Int!
+  "True when the station is offline."
+  maintenance: Boolean!
+}

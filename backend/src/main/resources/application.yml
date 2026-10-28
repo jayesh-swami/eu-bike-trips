@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: backend
+
+  datasource:
+    # The H2 file is built separately with ./gradlew flywayMigrate (see README).
+    # IFEXISTS=TRUE: fail at startup if it hasn't been built, instead of creating an empty DB.
+    # ACCESS_MODE_DATA=r: the app only reads.
+    url: jdbc:h2:file:${DB_PATH:../db/trips};IFEXISTS=TRUE;ACCESS_MODE_DATA=r
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      # Never create or change tables, only check that the entities match them.
+      ddl-auto: validate
+    # Logs every SQL statement, handy to see what each GraphQL query does.
+    show-sql: true
+    open-in-view: false
+
+  graphql:
+    graphiql:
+      # Interactive explorer at http://localhost:8080/graphiql
+      enabled: true
+
+  h2:
+    console:
+      # Browse the tables at http://localhost:8080/h2-console
+      # (JDBC URL: the datasource url above, user sa, empty password)
+      enabled: true
